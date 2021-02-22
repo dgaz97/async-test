@@ -95,7 +95,6 @@ namespace AsyncTest
                 WebResponse res = req.GetResponse();
                 var reader = new StreamReader(res.GetResponseStream());
                 Console.WriteLine("Downloaded");
-                Thread.Sleep(2000);
                 return reader.ReadToEnd();
             });
             Task<string> t2 = Task.Run<string>(() =>
@@ -104,7 +103,6 @@ namespace AsyncTest
                 WebResponse res = req.GetResponse();
                 var reader = new StreamReader(res.GetResponseStream());
                 Console.WriteLine("Downloaded");
-                Thread.Sleep(2000);
                 return reader.ReadToEnd();
             });
             Task<string> t3 = Task.Run<string>(() =>
@@ -120,15 +118,7 @@ namespace AsyncTest
             try
             {
                 Console.WriteLine("Starting download");
-
                 await all;
-                Console.WriteLine("All done");
-                await Task.Delay(2222);
-
-                Console.WriteLine(t1.Result.Length);
-                Console.WriteLine(t2.Result.Length);
-                Console.WriteLine(t3.Result.Length);
-
             }
             catch
             {
@@ -140,6 +130,9 @@ namespace AsyncTest
             }
             finally
             {
+                Console.WriteLine("All done");
+                await Task.Delay(2222);
+
                 if (t1.Exception == null)
                     Console.WriteLine(t1.Result.Length);
                 if (t2.Exception == null)
