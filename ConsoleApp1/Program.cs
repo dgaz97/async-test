@@ -94,7 +94,7 @@ namespace AsyncTest
                 WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Async/await");
                 WebResponse res = req.GetResponse();
                 var reader = new StreamReader(res.GetResponseStream());
-                Console.WriteLine("Downloaded");
+                Console.WriteLine("Downloaded T1");
                 return reader.ReadToEnd();
             });
             Task<string> t2 = Task.Run<string>(() =>
@@ -102,7 +102,7 @@ namespace AsyncTest
                 WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Python_(programming_language)");
                 WebResponse res = req.GetResponse();
                 var reader = new StreamReader(res.GetResponseStream());
-                Console.WriteLine("Downloaded");
+                Console.WriteLine("Downloaded T2");
                 return reader.ReadToEnd();
             });
             Task<string> t3 = Task.Run<string>(() =>
@@ -111,7 +111,7 @@ namespace AsyncTest
                 WebResponse res = req.GetResponse();
                 var reader = new StreamReader(res.GetResponseStream());
                 throw new Exception("Testing exceptions");
-                Console.WriteLine("Downloaded");
+                Console.WriteLine("Downloaded T3");
                 return reader.ReadToEnd();
             });
             Task all = Task.WhenAll(t1, t2, t3);
