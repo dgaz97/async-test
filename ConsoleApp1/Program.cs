@@ -14,6 +14,15 @@ namespace ConsoleApp1
             Thread monitorThread = new Thread(new ThreadStart(MonitorNetwork));
             monitorThread.Start();
 
+            if (monitorThread.Join(50))
+            {
+                Console.WriteLine("Joined");
+            }
+            else
+            {
+                monitorThread.Abort();//Bad practice
+                Console.WriteLine("Timeout, thread stopped");
+            }
             Console.ReadKey();
         }
 
