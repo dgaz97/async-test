@@ -96,10 +96,18 @@ namespace AsyncTest
             Task<string> t3 = Task.Run<string>(MethodClass.Method3);
             Task<string> t4 = Task.Run<string>(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000)));
             Task all = Task.WhenAll(t1, t2, t3, t4);
+            
             try
             {
                 Console.WriteLine("Starting download");
-                await all;
+                while (!all.IsCompleted)
+                {
+                    Console.Write(".");
+                    Thread.Sleep(250);
+                }
+                Console.WriteLine();
+
+                //await all;
             }
             catch
             {
@@ -120,6 +128,13 @@ namespace AsyncTest
                     Console.WriteLine(t2.Result.Length);
                 if (t3.Exception == null)
                     Console.WriteLine(t3.Result.Length);
+                else
+                {
+                    foreach (var i in t3.Exception.InnerExceptions)
+                    {
+                        Console.WriteLine(i.Message);
+                    }
+                }
                 if (t4.Exception == null)
                     Console.WriteLine(t4.Result);
             }
