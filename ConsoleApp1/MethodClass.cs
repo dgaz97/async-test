@@ -131,12 +131,13 @@ namespace ConsoleApp1
             return "Successful";
         }
 
-        public static async Task<string> Method9(CancellationToken ct)
+        public static string Method9(CancellationToken ct)
         {
             Console.WriteLine("Written in method9");
             for (int i = 0; i < 1000000000; i++) ;//Waste time, without calling delay
 
-            Task child = Task.Factory.StartNew(() => Console.WriteLine("Written in child of method9"), TaskCreationOptions.AttachedToParent);
+            Task child = Task.Factory.StartNew(() => throw new Exception("Another exception test, should propagate?"), TaskCreationOptions.AttachedToParent);
+            Task child2 = Task.Factory.StartNew(() => throw new Exception("Another nother exception test, should propagate?"), TaskCreationOptions.AttachedToParent);
 
             return "Method9 yes";
         }

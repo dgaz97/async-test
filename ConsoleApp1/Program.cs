@@ -96,9 +96,9 @@ namespace AsyncTest
             var CancelTokenSource4 = new CancellationTokenSource();
             var CancelTokenSource5 = new CancellationTokenSource();
 
-            Mutex m = new Mutex(false,"mut");
+            Mutex m = new Mutex(false, "mut");
             //m.
-            Progress<ProgressImplementation> po = new Progress<ProgressImplementation> (MethodClass.DisplayProgress);
+            Progress<ProgressImplementation> po = new Progress<ProgressImplementation>(MethodClass.DisplayProgress);
 
             Random r = new Random();
             Task<string> t1 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
@@ -108,15 +108,15 @@ namespace AsyncTest
             ///Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource2.Token));
             ///Task<long> t6 = t5.ContinueWith(tres => MethodClass.Method8(r.Next(1_000_000_000, 2_000_000_000),tres.Result, CancelTokenSource3.Token));
 
-            Task<string> t7 = Task.Run(() => MethodClass.Method5("ident 1",@"C:\test\test.txt",m, CancelTokenSource4.Token));
-            Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt",m, CancelTokenSource4.Token));
-            Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt",m, CancelTokenSource4.Token));
+            Task<string> t7 = Task.Run(() => MethodClass.Method5("ident 1", @"C:\test\test.txt", m, CancelTokenSource4.Token));
+            Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt", m, CancelTokenSource4.Token));
+            Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt", m, CancelTokenSource4.Token));
 
             Task<string> t10 = Task.Run(() => MethodClass.Method7(CancelTokenSource5.Token, po));
 
-            Task<string> t11 = Task.Run(() => MethodClass.Method9(CancelTokenSource5.Token));
+            Task<string> t11 = Task.Factory.StartNew(() => MethodClass.Method9(CancelTokenSource5.Token));
 
-            Task all = Task.WhenAll(t1, t2, t3/*, t4,t5,t6*/, t7, t8, t9,t10,t11);
+            Task all = Task.WhenAll(t1, t2, t3/*, t4,t5,t6*/, t7, t8, t9, t10, t11);
             try
             {
                 //CancelTokenSource3.CancelAfter(2000);
@@ -132,7 +132,7 @@ namespace AsyncTest
                         CancelTokenSource1.Cancel();
                         //Method4CancelTokenSource2.Cancel();
                     }
-                        
+
                     Console.Write(".");
                     await Task.Delay(500);
                 }
@@ -200,7 +200,7 @@ namespace AsyncTest
                 //else
                 //    Console.WriteLine(t6.Status);
 
-                if(t7.Status==TaskStatus.RanToCompletion)
+                if (t7.Status == TaskStatus.RanToCompletion)
                     Console.WriteLine(t7.Result);
                 else
                     Console.WriteLine(t7.Status);
@@ -218,6 +218,15 @@ namespace AsyncTest
                 else
                     Console.WriteLine(t10.Status);
 
+                if (t11.Exception == null)
+                    Console.WriteLine(t11.Result.Length);
+                else
+                {
+                    foreach (Exception e in t11.Exception.InnerExceptions)
+                    {
+                        Console.WriteLine(e.InnerException.Message);
+                    }
+                }
 
 
             }
