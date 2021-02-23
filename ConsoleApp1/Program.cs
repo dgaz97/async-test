@@ -90,9 +90,10 @@ namespace AsyncTest
 
         async static Task Main(string[] args)
         {
-            var Method4CancelTokenSource1 = new CancellationTokenSource();
-            var Method4CancelTokenSource2 = new CancellationTokenSource();
-            var Method4CancelTokenSource3 = new CancellationTokenSource();
+            var CancelTokenSource1 = new CancellationTokenSource();
+            var CancelTokenSource2 = new CancellationTokenSource();
+            var CancelTokenSource3 = new CancellationTokenSource();
+            var CancelTokenSource4 = new CancellationTokenSource();
 
             Mutex m = new Mutex(false,"mut");
             //m.
@@ -101,30 +102,30 @@ namespace AsyncTest
             Task<string> t1 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
             Task<string> t2 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Python_(programming_language)"));
             Task<string> t3 = Task.Run(() => MethodClass.Method3("https://en.wikipedia.org/wiki/Futures_and_promises"));
-            Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource1.Token));
-            Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource2.Token));
-            Task<long> t6 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource3.Token));
+            Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource1.Token));
+            Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource2.Token));
+            Task<long> t6 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource3.Token));
 
-            Task<string> t7 = Task.Run(() => MethodClass.Method5("ident 1",@"C:\test\test.txt",m));
-            Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt",m));
-            Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt",m));
+            Task<string> t7 = Task.Run(() => MethodClass.Method5("ident 1",@"C:\test\test.txt",m, CancelTokenSource4.Token));
+            Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt",m, CancelTokenSource4.Token));
+            Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt",m, CancelTokenSource4.Token));
 
             Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6, t7, t8, t9);
             try
             {
-                Method4CancelTokenSource3.CancelAfter(2000);
-                int cnt = 0;
+                CancelTokenSource3.CancelAfter(2000);
+                CancelTokenSource4.CancelAfter(100);
                 Console.WriteLine("Starting download");
                 while (!all.IsCompleted)
                 {
                     if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Q)
                     {
-                        Method4CancelTokenSource1.Cancel();
+                        CancelTokenSource1.Cancel();
                         //Method4CancelTokenSource2.Cancel();
                     }
                         
                     Console.Write(".");
-                    await Task.Delay(250);
+                    await Task.Delay(500);
                 }
                 Console.WriteLine();
             }
@@ -190,9 +191,18 @@ namespace AsyncTest
                 else
                     Console.WriteLine(t6.Status);
 
-                Console.WriteLine(t7.Result);
-                Console.WriteLine(t8.Result);
-                Console.WriteLine(t9.Result);
+                if(t7.Status==TaskStatus.RanToCompletion)
+                    Console.WriteLine(t7.Result);
+                else
+                    Console.WriteLine(t7.Status);
+                if (t8.Status == TaskStatus.RanToCompletion)
+                    Console.WriteLine(t8.Result);
+                else
+                    Console.WriteLine(t8.Status);
+                if (t9.Status == TaskStatus.RanToCompletion)
+                    Console.WriteLine(t9.Result);
+                else
+                    Console.WriteLine(t9.Status);
 
             }
             Console.ReadKey();

@@ -69,22 +69,28 @@ namespace ConsoleApp1
             return s;
         }
 
-        public static async Task<string> Method5(string ident, string filename, Mutex mutex)
+        public static async Task<string> Method5(string ident, string filename, Mutex mutex, CancellationToken ct)
         {
-            mutex.WaitOne();
-            string result = File.ReadAllText(filename);
             Console.WriteLine(ident);
+            WaitHandle.WaitAny(new WaitHandle[] { mutex, ct.WaitHandle });
+            ct.ThrowIfCancellationRequested();
+            string result = File.ReadAllText(filename);
+            await Task.Delay(20);
             mutex.ReleaseMutex();
+            ct.ThrowIfCancellationRequested();
             return ident+": "+result;
 
         }
 
-        public static async Task<string> Method6(string ident, string filename, Mutex mutex)
+        public static async Task<string> Method6(string ident, string filename, Mutex mutex, CancellationToken ct)
         {
-            mutex.WaitOne();
-            File.WriteAllText(filename,"Now it says something else lol");
             Console.WriteLine(ident);
+            WaitHandle.WaitAny(new WaitHandle[] { mutex, ct.WaitHandle });
+            ct.ThrowIfCancellationRequested();
+            File.WriteAllText(filename,"Now it says something else lol");
+            await Task.Delay(20);
             mutex.ReleaseMutex();
+            ct.ThrowIfCancellationRequested();
             return ident + ": " + "Written some stuff";
 
         }
