@@ -94,6 +94,9 @@ namespace AsyncTest
             var Method4CancelTokenSource2 = new CancellationTokenSource();
             var Method4CancelTokenSource3 = new CancellationTokenSource();
 
+            Mutex m = new Mutex(false,"mut");
+            //m.
+
             Random r = new Random();
             Task<string> t1 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
             Task<string> t2 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Python_(programming_language)"));
@@ -101,7 +104,12 @@ namespace AsyncTest
             Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource1.Token));
             Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource2.Token));
             Task<long> t6 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource3.Token));
-            Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6);
+
+            Task<string> t7 = Task.Run(() => MethodClass.Method5("ident 1",@"C:\test\test.txt",m));
+            Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt",m));
+            Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt",m));
+
+            Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6, t7, t8, t9);
             try
             {
                 Method4CancelTokenSource3.CancelAfter(2000);
@@ -181,6 +189,10 @@ namespace AsyncTest
                 }
                 else
                     Console.WriteLine(t6.Status);
+
+                Console.WriteLine(t7.Result);
+                Console.WriteLine(t8.Result);
+                Console.WriteLine(t9.Result);
 
             }
             Console.ReadKey();

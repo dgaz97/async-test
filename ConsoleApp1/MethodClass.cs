@@ -69,6 +69,25 @@ namespace ConsoleApp1
             return s;
         }
 
+        public static async Task<string> Method5(string ident, string filename, Mutex mutex)
+        {
+            mutex.WaitOne();
+            string result = File.ReadAllText(filename);
+            Console.WriteLine(ident);
+            mutex.ReleaseMutex();
+            return ident+": "+result;
+
+        }
+
+        public static async Task<string> Method6(string ident, string filename, Mutex mutex)
+        {
+            mutex.WaitOne();
+            File.WriteAllText(filename,"Now it says something else lol");
+            Console.WriteLine(ident);
+            mutex.ReleaseMutex();
+            return ident + ": " + "Written some stuff";
+
+        }
 
     }
 }
