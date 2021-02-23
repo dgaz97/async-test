@@ -110,7 +110,7 @@ namespace AsyncTest
                     if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Q)
                     {
                         Method4CancelTokenSource1.Cancel();
-                        Method4CancelTokenSource2.Cancel();
+                        //Method4CancelTokenSource2.Cancel();
                     }
                         
                     Console.Write(".");
@@ -144,12 +144,43 @@ namespace AsyncTest
                         Console.WriteLine(e.Message);
                     }
                 }
-                if (t4.Exception == null)
+
+                if (t4.Exception == null && t4.Status!=TaskStatus.Canceled)
                     Console.WriteLine(t4.Result);
-                if (t5.Exception == null)
-                    Console.WriteLine(t5.Result); 
-                if (t6.Exception == null)
+                else if(t4.Status != TaskStatus.Canceled)
+                {
+                    foreach (var e in t4.Exception.InnerExceptions)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }else
+                    Console.WriteLine(t4.Status);
+
+                if (t5.Exception == null && t5.Status != TaskStatus.Canceled)
+                    Console.WriteLine(t5.Result);
+                else if(t5.Status != TaskStatus.Canceled)
+                {
+                    foreach (var e in t5.Exception.InnerExceptions)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+                else
+                    Console.WriteLine(t5.Status);
+
+                if (t6.Exception == null && t6.Status != TaskStatus.Canceled)
                     Console.WriteLine(t6.Result);
+                else if(t6.Status != TaskStatus.Canceled)
+                {
+                    foreach (var e in t6.Exception.InnerExceptions)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+                else
+                    Console.WriteLine(t6.Status);
+
+                Console.WriteLine(t6.Status);
 
             }
             Console.ReadKey();

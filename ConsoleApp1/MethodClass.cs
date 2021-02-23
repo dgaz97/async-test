@@ -54,15 +54,14 @@ namespace ConsoleApp1
 
         public static async Task<long> Method4(int number, CancellationToken ct)
         {
-            //Console.WriteLine(number);
+            int i = 1;
             long s = 0;
-            for (int i = 1; i <= number; i++)
+            ct.Register(() => Console.WriteLine($"Method cancelled on {i} of {number}, at sum {s}"));
+            //Console.WriteLine(number);
+            for (i = 1; i <= number; i++)
             {
-                if (ct.IsCancellationRequested && i%1000000==0)
-                {
-                    Console.WriteLine($"Method 4 cancelled at {i} out of {number} with sum {s}");
-                    return s;
-                }
+                
+                ct.ThrowIfCancellationRequested();
                 s += i;
             }
             //Console.WriteLine(number);
