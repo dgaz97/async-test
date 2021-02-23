@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConsoleApp1;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -87,34 +88,14 @@ namespace AsyncTest
             Console.ReadKey();
         }*/
 
-        async static Task Main()
+        async static Task Main(string[] args)
         {
-            Task<string> t1 = Task.Run<string>(() =>
-            {
-                WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Async/await");
-                WebResponse res = req.GetResponse();
-                var reader = new StreamReader(res.GetResponseStream());
-                Console.WriteLine("Downloaded T1");
-                return reader.ReadToEnd();
-            });
-            Task<string> t2 = Task.Run<string>(() =>
-            {
-                WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Python_(programming_language)");
-                WebResponse res = req.GetResponse();
-                var reader = new StreamReader(res.GetResponseStream());
-                Console.WriteLine("Downloaded T2");
-                return reader.ReadToEnd();
-            });
-            Task<string> t3 = Task.Run<string>(() =>
-            {
-                WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Python_(programming_language)");
-                WebResponse res = req.GetResponse();
-                var reader = new StreamReader(res.GetResponseStream());
-                throw new Exception("Testing exceptions");
-                Console.WriteLine("Downloaded T3");
-                return reader.ReadToEnd();
-            });
-            Task all = Task.WhenAll(t1, t2, t3);
+            Random r = new Random();
+            Task<string> t1 = Task.Run<string>(MethodClass.Method1);
+            Task<string> t2 = Task.Run<string>(MethodClass.Method2);
+            Task<string> t3 = Task.Run<string>(MethodClass.Method3);
+            Task<string> t4 = Task.Run<string>(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000)));
+            Task all = Task.WhenAll(t1, t2, t3, t4);
             try
             {
                 Console.WriteLine("Starting download");
@@ -139,6 +120,8 @@ namespace AsyncTest
                     Console.WriteLine(t2.Result.Length);
                 if (t3.Exception == null)
                     Console.WriteLine(t3.Result.Length);
+                if (t4.Exception == null)
+                    Console.WriteLine(t4.Result);
             }
             Console.ReadKey();
 
