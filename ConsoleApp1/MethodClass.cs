@@ -60,7 +60,7 @@ namespace ConsoleApp1
             //Console.WriteLine(number);
             for (i = 1; i <= number; i++)
             {
-                
+
                 ct.ThrowIfCancellationRequested();
                 s += i;
             }
@@ -78,7 +78,7 @@ namespace ConsoleApp1
             await Task.Delay(20);
             mutex.ReleaseMutex();
             ct.ThrowIfCancellationRequested();
-            return ident+": "+result;
+            return ident + ": " + result;
 
         }
 
@@ -87,12 +87,37 @@ namespace ConsoleApp1
             Console.WriteLine(ident);
             WaitHandle.WaitAny(new WaitHandle[] { mutex, ct.WaitHandle });
             ct.ThrowIfCancellationRequested();
-            File.WriteAllText(filename,"Now it says something else lol");
+            File.WriteAllText(filename, "Now it says something else lol");
             await Task.Delay(20);
             mutex.ReleaseMutex();
             ct.ThrowIfCancellationRequested();
             return ident + ": " + "Written some stuff";
 
+        }
+
+        public static async Task<string> Method7(CancellationToken ct, IProgress<ProgressImplementation> progressObserver)
+        {
+            progressObserver.Report(new ProgressImplementation(20));
+            await Task.Delay(2000);
+            ct.ThrowIfCancellationRequested();
+            progressObserver.Report(new ProgressImplementation(40));
+            await Task.Delay(2000);
+            ct.ThrowIfCancellationRequested();
+            progressObserver.Report(new ProgressImplementation(60));
+            await Task.Delay(2000);
+            ct.ThrowIfCancellationRequested();
+            progressObserver.Report(new ProgressImplementation(80));
+            await Task.Delay(2000);
+            ct.ThrowIfCancellationRequested();
+            progressObserver.Report(new ProgressImplementation(100));
+
+            return "Successful";
+        }
+
+
+        public static void DisplayProgress(ProgressImplementation progress) { 
+            //Console.SetCursorPosition(0,0); 
+            Console.Write("Progress Tracker says: {0}% Done", progress.OverallProgress); 
         }
 
     }

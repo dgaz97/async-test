@@ -94,9 +94,11 @@ namespace AsyncTest
             var CancelTokenSource2 = new CancellationTokenSource();
             var CancelTokenSource3 = new CancellationTokenSource();
             var CancelTokenSource4 = new CancellationTokenSource();
+            var CancelTokenSource5 = new CancellationTokenSource();
 
             Mutex m = new Mutex(false,"mut");
             //m.
+            Progress<ProgressImplementation> po = new Progress<ProgressImplementation> (MethodClass.DisplayProgress);
 
             Random r = new Random();
             Task<string> t1 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
@@ -110,7 +112,9 @@ namespace AsyncTest
             Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt",m, CancelTokenSource4.Token));
             Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt",m, CancelTokenSource4.Token));
 
-            Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6, t7, t8, t9);
+            Task<string> t10 = Task.Run(() => MethodClass.Method7(CancelTokenSource5.Token, po));
+
+            Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6, t7, t8, t9,t10);
             try
             {
                 CancelTokenSource3.CancelAfter(2000);
@@ -203,6 +207,11 @@ namespace AsyncTest
                     Console.WriteLine(t9.Result);
                 else
                     Console.WriteLine(t9.Status);
+
+                if (t10.Status == TaskStatus.RanToCompletion)
+                    Console.WriteLine(t10.Result);
+                else
+                    Console.WriteLine(t10.Status);
 
             }
             Console.ReadKey();
