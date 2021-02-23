@@ -69,6 +69,23 @@ namespace ConsoleApp1
             return s;
         }
 
+        public static long Method8(int number, long start, CancellationToken ct)
+        {
+            int i = 1;
+            long s = start;
+            ct.Register(() => Console.WriteLine($"Method cancelled on {i} of {number}, at sum {s}"));
+            //Console.WriteLine(number);
+            for (i = 1; i <= number; i++)
+            {
+
+                ct.ThrowIfCancellationRequested();
+                s += i;
+            }
+            //Console.WriteLine(number);
+            //Console.WriteLine("Summed up T4");
+            return s;
+        }
+
         public static async Task<string> Method5(string ident, string filename, Mutex mutex, CancellationToken ct)
         {
             Console.WriteLine(ident);
@@ -98,20 +115,30 @@ namespace ConsoleApp1
         public static async Task<string> Method7(CancellationToken ct, IProgress<ProgressImplementation> progressObserver)
         {
             progressObserver.Report(new ProgressImplementation(20));
-            await Task.Delay(2000);
+            await Task.Delay(500);
             ct.ThrowIfCancellationRequested();
             progressObserver.Report(new ProgressImplementation(40));
-            await Task.Delay(2000);
+            await Task.Delay(500);
             ct.ThrowIfCancellationRequested();
             progressObserver.Report(new ProgressImplementation(60));
-            await Task.Delay(2000);
+            await Task.Delay(500);
             ct.ThrowIfCancellationRequested();
             progressObserver.Report(new ProgressImplementation(80));
-            await Task.Delay(2000);
+            await Task.Delay(500);
             ct.ThrowIfCancellationRequested();
             progressObserver.Report(new ProgressImplementation(100));
 
             return "Successful";
+        }
+
+        public static async Task<string> Method9(CancellationToken ct)
+        {
+            Console.WriteLine("Written in method9");
+            for (int i = 0; i < 1000000000; i++) ;//Waste time, without calling delay
+
+            Task child = Task.Factory.StartNew(() => Console.WriteLine("Written in child of method9"), TaskCreationOptions.AttachedToParent);
+
+            return "Method9 yes";
         }
 
 

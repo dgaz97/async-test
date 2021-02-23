@@ -104,9 +104,9 @@ namespace AsyncTest
             Task<string> t1 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
             Task<string> t2 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Python_(programming_language)"));
             Task<string> t3 = Task.Run(() => MethodClass.Method3("https://en.wikipedia.org/wiki/Futures_and_promises"));
-            Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource1.Token));
-            Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource2.Token));
-            Task<long> t6 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource3.Token));
+            ///Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource1.Token));
+            ///Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource2.Token));
+            ///Task<long> t6 = t5.ContinueWith(tres => MethodClass.Method8(r.Next(1_000_000_000, 2_000_000_000),tres.Result, CancelTokenSource3.Token));
 
             Task<string> t7 = Task.Run(() => MethodClass.Method5("ident 1",@"C:\test\test.txt",m, CancelTokenSource4.Token));
             Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt",m, CancelTokenSource4.Token));
@@ -114,11 +114,16 @@ namespace AsyncTest
 
             Task<string> t10 = Task.Run(() => MethodClass.Method7(CancelTokenSource5.Token, po));
 
-            Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6, t7, t8, t9,t10);
+            Task<string> t11 = Task.Run(() => MethodClass.Method9(CancelTokenSource5.Token));
+
+            Task all = Task.WhenAll(t1, t2, t3/*, t4,t5,t6*/, t7, t8, t9,t10,t11);
             try
             {
-                CancelTokenSource3.CancelAfter(2000);
+                //CancelTokenSource3.CancelAfter(2000);
                 CancelTokenSource4.CancelAfter(100);
+
+
+
                 Console.WriteLine("Starting download");
                 while (!all.IsCompleted)
                 {
@@ -160,40 +165,40 @@ namespace AsyncTest
                     }
                 }
 
-                if (t4.Exception == null && t4.Status!=TaskStatus.Canceled)
-                    Console.WriteLine(t4.Result);
-                else if(t4.Status != TaskStatus.Canceled)
-                {
-                    foreach (var e in t4.Exception.InnerExceptions)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
-                }else
-                    Console.WriteLine(t4.Status);
-
-                if (t5.Exception == null && t5.Status != TaskStatus.Canceled)
-                    Console.WriteLine(t5.Result);
-                else if(t5.Status != TaskStatus.Canceled)
-                {
-                    foreach (var e in t5.Exception.InnerExceptions)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
-                }
-                else
-                    Console.WriteLine(t5.Status);
-
-                if (t6.Exception == null && t6.Status != TaskStatus.Canceled)
-                    Console.WriteLine(t6.Result);
-                else if(t6.Status != TaskStatus.Canceled)
-                {
-                    foreach (var e in t6.Exception.InnerExceptions)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
-                }
-                else
-                    Console.WriteLine(t6.Status);
+                //if (t4.Exception == null && t4.Status!=TaskStatus.Canceled)
+                //    Console.WriteLine(t4.Result);
+                //else if(t4.Status != TaskStatus.Canceled)
+                //{
+                //    foreach (var e in t4.Exception.InnerExceptions)
+                //    {
+                //        Console.WriteLine(e.Message);
+                //    }
+                //}else
+                //    Console.WriteLine(t4.Status);
+                //
+                //if (t5.Exception == null && t5.Status != TaskStatus.Canceled)
+                //    Console.WriteLine(t5.Result);
+                //else if(t5.Status != TaskStatus.Canceled)
+                //{
+                //    foreach (var e in t5.Exception.InnerExceptions)
+                //    {
+                //        Console.WriteLine(e.Message);
+                //    }
+                //}
+                //else
+                //    Console.WriteLine(t5.Status);
+                //
+                //if (t6.Exception == null && t6.Status != TaskStatus.Canceled)
+                //    Console.WriteLine(t6.Result);
+                //else if(t6.Status != TaskStatus.Canceled)
+                //{
+                //    foreach (var e in t6.Exception.InnerExceptions)
+                //    {
+                //        Console.WriteLine(e.Message);
+                //    }
+                //}
+                //else
+                //    Console.WriteLine(t6.Status);
 
                 if(t7.Status==TaskStatus.RanToCompletion)
                     Console.WriteLine(t7.Result);
@@ -212,6 +217,8 @@ namespace AsyncTest
                     Console.WriteLine(t10.Result);
                 else
                     Console.WriteLine(t10.Status);
+
+
 
             }
             Console.ReadKey();
