@@ -90,24 +90,32 @@ namespace AsyncTest
 
         async static Task Main(string[] args)
         {
+            var Method4CancelTokenSource1 = new CancellationTokenSource();
+            var Method4CancelTokenSource2 = new CancellationTokenSource();
+
             Random r = new Random();
             Task<string> t1 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
             Task<string> t2 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Python_(programming_language)"));
             Task<string> t3 = Task.Run(() => MethodClass.Method3("https://en.wikipedia.org/wiki/Futures_and_promises"));
-            Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000)));
-            Task all = Task.WhenAll(t1, t2, t3, t4);
-            
+            Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000), Method4CancelTokenSource1.Token));
+            Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000), Method4CancelTokenSource1.Token));
+            Task<long> t6 = Task.Run(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000), Method4CancelTokenSource2.Token));
+            Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6);
             try
             {
+                int cnt = 0;
                 Console.WriteLine("Starting download");
                 while (!all.IsCompleted)
                 {
+                    cnt++;
+                    if (cnt == 4)
+                    {
+                        Method4CancelTokenSource1.Cancel();
+                    }
                     Console.Write(".");
                     await Task.Delay(250);
                 }
                 Console.WriteLine();
-
-                //await all;
             }
             catch
             {
@@ -128,15 +136,13 @@ namespace AsyncTest
                     Console.WriteLine(t2.Result.Length);
                 if (t3.Exception == null)
                     Console.WriteLine(t3.Result.Length);
-                else
-                {
-                    foreach (var i in t3.Exception.InnerExceptions)
-                    {
-                        Console.WriteLine(i.Message);
-                    }
-                }
                 if (t4.Exception == null)
                     Console.WriteLine(t4.Result);
+                if (t5.Exception == null)
+                    Console.WriteLine(t5.Result); 
+                if (t6.Exception == null)
+                    Console.WriteLine(t6.Result);
+
             }
             Console.ReadKey();
 
