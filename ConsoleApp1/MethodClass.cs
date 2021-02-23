@@ -58,7 +58,7 @@ namespace ConsoleApp1
             long s = 0;
             for (int i = 1; i <= number; i++)
             {
-                if (ct.IsCancellationRequested)
+                if (ct.IsCancellationRequested && i%1000000==0)
                 {
                     Console.WriteLine($"Method 4 cancelled at {i} out of {number} with sum {s}");
                     return s;

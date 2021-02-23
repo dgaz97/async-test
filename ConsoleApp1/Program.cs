@@ -137,6 +137,13 @@ namespace AsyncTest
                     Console.WriteLine(t2.Result.Length);
                 if (t3.Exception == null)
                     Console.WriteLine(t3.Result.Length);
+                else
+                {
+                    foreach (var e in t3.Exception.InnerExceptions)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
                 if (t4.Exception == null)
                     Console.WriteLine(t4.Result);
                 if (t5.Exception == null)
