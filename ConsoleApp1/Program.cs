@@ -91,9 +91,9 @@ namespace AsyncTest
         async static Task Main(string[] args)
         {
             Random r = new Random();
-            Task<string> t1 = Task.Run<string>(MethodClass.Method1);
-            Task<string> t2 = Task.Run<string>(MethodClass.Method2);
-            Task<string> t3 = Task.Run<string>(MethodClass.Method3);
+            Task<string> t1 = Task.Run<string>(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
+            Task<string> t2 = Task.Run<string>(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Python_(programming_language)"));
+            Task<string> t3 = Task.Run<string>(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Futures_and_promises"));
             Task<string> t4 = Task.Run<string>(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000)));
             Task all = Task.WhenAll(t1, t2, t3, t4);
             

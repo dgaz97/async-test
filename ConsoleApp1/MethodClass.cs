@@ -10,33 +10,65 @@ namespace ConsoleApp1
 {
     public class MethodClass
     {
-        public static async Task<string> Method1()
+        public static Task<string> Method1(string url)
         {
-            WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Async/await");
-            WebResponse res = req.GetResponse();
-            var reader = new StreamReader(res.GetResponseStream());
-            //Console.WriteLine("Downloaded T1");
-            return reader.ReadToEnd();
+            WebRequest req = WebRequest.Create(url);
+
+            IAsyncResult ar = req.BeginGetResponse((a) => Console.Write(a.IsCompleted), null);
+
+            Task<string> downloadTask = Task.Factory.FromAsync<string>(ar, iar =>
+            {
+                using (WebResponse res = req.EndGetResponse(iar))
+                {
+                    using(var reader = new StreamReader(res.GetResponseStream()))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
+            });
+
+            return downloadTask;
         }
 
-        public static async Task<string> Method2()
-        {
-            WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Python_(programming_language)");
-            WebResponse res = req.GetResponse();
-            var reader = new StreamReader(res.GetResponseStream());
-            //Console.WriteLine("Downloaded T2");
-            return reader.ReadToEnd();
-        }
+        //public static Task<string> Method2()
+        //{
+        //    WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Python_(programming_language)");
+        //    IAsyncResult ar = req.BeginGetResponse(null, null);
+        //
+        //    Task<string> downloadTask = Task.Factory.FromAsync<string>(ar, iar =>
+        //    {
+        //        using (WebResponse res = req.EndGetResponse(iar))
+        //        {
+        //            using (var reader = new StreamReader(res.GetResponseStream()))
+        //            {
+        //                return reader.ReadToEnd();
+        //            }
+        //        }
+        //    });
+        //
+        //    return downloadTask;
+        //}
 
-        public static async Task<string> Method3()
-        {
-            WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Python_(programming_language)");
-            WebResponse res = req.GetResponse();
-            var reader = new StreamReader(res.GetResponseStream());
-            throw new Exception("Testing exceptions");
-            //Console.WriteLine("Downloaded T3");
-            return reader.ReadToEnd();
-        }
+        //public static Task<string> Method3()
+        //{
+        //    WebRequest req = WebRequest.Create("https://en.wikipedia.org/wiki/Python_(programming_language)");
+        //    IAsyncResult ar = req.BeginGetResponse(null, null);
+        //
+        //    Task<string> downloadTask = Task.Factory.FromAsync<string>(ar, iar =>
+        //    {
+        //        using (WebResponse res = req.EndGetResponse(iar))
+        //        {
+        //            using (var reader = new StreamReader(res.GetResponseStream()))
+        //            {
+        //                return reader.ReadToEnd();
+        //            }
+        //        }
+        //    });
+        //
+        //    throw new Exception("Testing exceptions");
+        //    return downloadTask;
+        //    //Console.WriteLine("Downloaded T3");
+        //}
 
         public static async Task<string> Method4(int number)
         {
