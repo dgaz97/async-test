@@ -92,17 +92,19 @@ namespace AsyncTest
         {
             var Method4CancelTokenSource1 = new CancellationTokenSource();
             var Method4CancelTokenSource2 = new CancellationTokenSource();
+            var Method4CancelTokenSource3 = new CancellationTokenSource();
 
             Random r = new Random();
             Task<string> t1 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
             Task<string> t2 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Python_(programming_language)"));
             Task<string> t3 = Task.Run(() => MethodClass.Method3("https://en.wikipedia.org/wiki/Futures_and_promises"));
             Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource1.Token));
-            Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource1.Token));
-            Task<long> t6 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource2.Token));
+            Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource2.Token));
+            Task<long> t6 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), Method4CancelTokenSource3.Token));
             Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6);
             try
             {
+                Method4CancelTokenSource3.CancelAfter(2000);
                 int cnt = 0;
                 Console.WriteLine("Starting download");
                 while (!all.IsCompleted)
@@ -179,8 +181,6 @@ namespace AsyncTest
                 }
                 else
                     Console.WriteLine(t6.Status);
-
-                Console.WriteLine(t6.Status);
 
             }
             Console.ReadKey();
