@@ -91,10 +91,10 @@ namespace AsyncTest
         async static Task Main(string[] args)
         {
             Random r = new Random();
-            Task<string> t1 = Task.Run<string>(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
-            Task<string> t2 = Task.Run<string>(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Python_(programming_language)"));
-            Task<string> t3 = Task.Run<string>(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Futures_and_promises"));
-            Task<string> t4 = Task.Run<string>(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000)));
+            Task<string> t1 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Async/await"));
+            Task<string> t2 = Task.Run(() => MethodClass.Method1("https://en.wikipedia.org/wiki/Python_(programming_language)"));
+            Task<string> t3 = Task.Run(() => MethodClass.Method3("https://en.wikipedia.org/wiki/Futures_and_promises"));
+            Task<long> t4 = Task.Run(() => MethodClass.Method4(r.Next(100_000_000, 1_000_000_000)));
             Task all = Task.WhenAll(t1, t2, t3, t4);
             
             try
@@ -103,7 +103,7 @@ namespace AsyncTest
                 while (!all.IsCompleted)
                 {
                     Console.Write(".");
-                    Thread.Sleep(250);
+                    await Task.Delay(250);
                 }
                 Console.WriteLine();
 
@@ -119,8 +119,8 @@ namespace AsyncTest
             }
             finally
             {
-                Console.WriteLine("All done");
-                await Task.Delay(2222);
+                Console.WriteLine("All done, preparing results");
+                await Task.Delay(1000);
 
                 if (t1.Exception == null)
                     Console.WriteLine(t1.Result.Length);
