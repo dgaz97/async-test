@@ -86,29 +86,65 @@ namespace ConsoleApp1
             return s;
         }
 
-        public static async Task<string> Method5(string ident, string filename, Mutex mutex, CancellationToken ct)
+        public static async Task<string> Method5(string ident, string filename, CancellationToken ct)
         {
-            Console.WriteLine(ident);
-            WaitHandle.WaitAny(new WaitHandle[] { mutex, ct.WaitHandle });
-            ct.ThrowIfCancellationRequested();
-            string result = File.ReadAllText(filename);
-            await Task.Delay(20);
-            mutex.ReleaseMutex();
-            ct.ThrowIfCancellationRequested();
+            bool lockTaken = false;
+
+            string result = "reader failed, timed-out";
+            try
+            {
+                Monitor.TryEnter(filename, new TimeSpan(500), ref lockTaken);
+                if (lockTaken)
+                {
+                    Console.WriteLine(ident + " entered lock");
+                    ct.ThrowIfCancellationRequested();
+                    result = File.ReadAllText(filename);
+                    Thread.Sleep(20);
+                    Console.WriteLine(ident + " left lock");
+                }
+                else
+                {
+                    throw new TimeoutException("Failed to get lock on: " + filename);
+                }
+            }
+            finally
+            {
+                if (lockTaken)
+                    Monitor.Exit(filename);
+            }
             return ident + ": " + result;
 
         }
 
-        public static async Task<string> Method6(string ident, string filename, Mutex mutex, CancellationToken ct)
+        public static async Task<string> Method6(string ident, string filename, CancellationToken ct)
         {
-            Console.WriteLine(ident);
-            WaitHandle.WaitAny(new WaitHandle[] { mutex, ct.WaitHandle });
-            ct.ThrowIfCancellationRequested();
-            File.WriteAllText(filename, "Now it says something else lol");
-            await Task.Delay(20);
-            mutex.ReleaseMutex();
-            ct.ThrowIfCancellationRequested();
-            return ident + ": " + "Written some stuff";
+            bool lockTaken = false;
+
+            string result = "writer failed, timed-out";
+
+            try
+            {
+                Monitor.TryEnter(filename, new TimeSpan(500), ref lockTaken);
+                if (lockTaken)
+                {
+                    Console.WriteLine(ident + " entered lock");
+                    ct.ThrowIfCancellationRequested();
+                    File.WriteAllText(filename, "Now it says something else lol");
+                    result = "Written some stuff";
+                    Thread.Sleep(20);
+                    Console.WriteLine(ident + " left lock");
+                }
+                else
+                {
+                    throw new TimeoutException("Failed to get lock on: " + filename);
+                }
+            }
+            finally
+            {
+                if (lockTaken)
+                    Monitor.Exit(filename);
+            }
+            return ident + ": " + result;
 
         }
 
@@ -144,7 +180,7 @@ namespace ConsoleApp1
 
         public static void UnsafeIncrement(ref int n)
         {
-            for(int i = 0; i < 50_000_000; i++)
+            for (int i = 0; i < 50_000_000; i++)
             {
                 n++;
             }
@@ -159,9 +195,10 @@ namespace ConsoleApp1
         }
 
 
-        public static void DisplayProgress(ProgressImplementation progress) { 
+        public static void DisplayProgress(ProgressImplementation progress)
+        {
             //Console.SetCursorPosition(0,0); 
-            Console.Write("Progress Tracker says: {0}% Done", progress.OverallProgress); 
+            Console.Write("Progress Tracker says: {0}% Done", progress.OverallProgress);
         }
 
     }

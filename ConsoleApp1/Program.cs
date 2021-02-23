@@ -99,7 +99,7 @@ namespace AsyncTest
             int number = 0;
             int number2 = 0;
 
-            Mutex m = new Mutex(false, "mut");
+            //Mutex m = new Mutex(false, "mut");
             //m.
             Progress<ProgressImplementation> po = new Progress<ProgressImplementation>(MethodClass.DisplayProgress);
 
@@ -111,9 +111,9 @@ namespace AsyncTest
             ///Task<long> t5 = Task.Run(() => MethodClass.Method4(r.Next(1_000_000_000, 2_000_000_000), CancelTokenSource2.Token));
             ///Task<long> t6 = t5.ContinueWith(tres => MethodClass.Method8(r.Next(1_000_000_000, 2_000_000_000),tres.Result, CancelTokenSource3.Token));
 
-            Task<string> t7 = Task.Run(() => MethodClass.Method5("ident 1", @"C:\test\test.txt", m, CancelTokenSource4.Token));
-            Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt", m, CancelTokenSource4.Token));
-            Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt", m, CancelTokenSource4.Token));
+            Task<string> t7 = Task.Run(() => MethodClass.Method5("ident 1", @"C:\test\test.txt", CancelTokenSource4.Token));
+            Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt", CancelTokenSource4.Token));
+            Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt", CancelTokenSource4.Token));
 
             //Task<string> t10 = Task.Run(() => MethodClass.Method7(CancelTokenSource5.Token, po));
 
