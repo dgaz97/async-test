@@ -142,6 +142,22 @@ namespace ConsoleApp1
             return "Method9 yes";
         }
 
+        public static void UnsafeIncrement(ref int n)
+        {
+            for(int i = 0; i < 50_000_000; i++)
+            {
+                n++;
+            }
+        }
+
+        public static void SafeIncrement(ref int n)
+        {
+            for (int i = 0; i < 50_000_000; i++)
+            {
+                Interlocked.Add(ref n, 1);
+            }
+        }
+
 
         public static void DisplayProgress(ProgressImplementation progress) { 
             //Console.SetCursorPosition(0,0); 

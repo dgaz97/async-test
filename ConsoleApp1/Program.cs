@@ -96,6 +96,9 @@ namespace AsyncTest
             var CancelTokenSource4 = new CancellationTokenSource();
             var CancelTokenSource5 = new CancellationTokenSource();
 
+            int number = 0;
+            int number2 = 0;
+
             Mutex m = new Mutex(false, "mut");
             //m.
             Progress<ProgressImplementation> po = new Progress<ProgressImplementation>(MethodClass.DisplayProgress);
@@ -112,11 +115,21 @@ namespace AsyncTest
             Task<string> t8 = Task.Run(() => MethodClass.Method6("ident 2", @"C:\test\test.txt", m, CancelTokenSource4.Token));
             Task<string> t9 = Task.Run(() => MethodClass.Method5("ident 3", @"C:\test\test.txt", m, CancelTokenSource4.Token));
 
-            Task<string> t10 = Task.Run(() => MethodClass.Method7(CancelTokenSource5.Token, po));
+            //Task<string> t10 = Task.Run(() => MethodClass.Method7(CancelTokenSource5.Token, po));
 
             Task<string> t11 = Task.Factory.StartNew(() => MethodClass.Method9(CancelTokenSource5.Token));
 
-            Task all = Task.WhenAll(t1, t2, t3/*, t4,t5,t6*/, t7, t8, t9, t10, t11);
+            Task t12 = Task.Factory.StartNew(() => MethodClass.UnsafeIncrement(ref number));
+            Task t13 = Task.Factory.StartNew(() => MethodClass.UnsafeIncrement(ref number));
+            Task t14 = Task.Factory.StartNew(() => MethodClass.UnsafeIncrement(ref number));
+            Task t15 = Task.Factory.StartNew(() => MethodClass.UnsafeIncrement(ref number));
+
+            Task t16 = Task.Factory.StartNew(() => MethodClass.SafeIncrement(ref number2));
+            Task t17 = Task.Factory.StartNew(() => MethodClass.SafeIncrement(ref number2));
+            Task t18 = Task.Factory.StartNew(() => MethodClass.SafeIncrement(ref number2));
+            Task t19 = Task.Factory.StartNew(() => MethodClass.SafeIncrement(ref number2));
+
+            Task all = Task.WhenAll(t1, t2, t3/*, t4,t5,t6*/, t7, t8, t9, /*t10,*/ t11, t12,t13,t14,t15,t16,t17,t18,t19);
             try
             {
                 //CancelTokenSource3.CancelAfter(2000);
@@ -213,10 +226,10 @@ namespace AsyncTest
                 else
                     Console.WriteLine(t9.Status);
 
-                if (t10.Status == TaskStatus.RanToCompletion)
-                    Console.WriteLine(t10.Result);
-                else
-                    Console.WriteLine(t10.Status);
+                //if (t10.Status == TaskStatus.RanToCompletion)
+                //    Console.WriteLine(t10.Result);
+                //else
+                //    Console.WriteLine(t10.Status);
 
                 if (t11.Exception == null)
                     Console.WriteLine(t11.Result.Length);
@@ -228,7 +241,8 @@ namespace AsyncTest
                     }
                 }
 
-
+                Console.WriteLine(number);
+                Console.WriteLine(number2);
             }
             Console.ReadKey();
 
