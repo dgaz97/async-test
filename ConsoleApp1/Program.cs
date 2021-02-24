@@ -255,7 +255,7 @@ namespace AsyncTest
             Mutex mutex = new Mutex(false,"Mutex testiranje");
             Task t1 = Task.Run(async () =>
             {
-                for (int i = 0; i < 100_000; i++)
+                for (int i = 0; i < 100; i++)
                 {
                     mutex.WaitOne();
                     string s = File.ReadAllText(@"C:\test\test2.txt");
@@ -273,7 +273,7 @@ namespace AsyncTest
 
             Task t2 = Task.Run(async () =>
             {
-                for (int i = 0; i < 100_000; i++)
+                for (int i = 0; i < 100; i++)
                 {
                     mutex.WaitOne();
                     string s = File.ReadAllText(@"C:\test\test2.txt");
@@ -297,6 +297,22 @@ namespace AsyncTest
             }
             //await t1;
             Console.WriteLine("Done with status: "+t1.Status+"-"+t2.Status);
+
+
+            Lazy<SumPair> pair = new Lazy<SumPair>();
+
+            Console.WriteLine(pair==null?"Null":"Not null");
+            Console.WriteLine(pair.IsValueCreated?"Value created": "Value not created");
+
+            pair.Value.numberToSum = 40;
+
+            Console.WriteLine(pair == null ? "Null" : "Not null");
+            Console.WriteLine(pair.IsValueCreated ? "Value created" : "Value not created");
+
+
+
+
+
             Console.ReadKey();
         }
 
