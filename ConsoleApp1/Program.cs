@@ -99,7 +99,7 @@ namespace AsyncTest
             int number = 0;
             int number2 = 0;
 
-            ReaderWriterLock rwl = new ReaderWriterLock();
+            ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
 
             //Mutex m = new Mutex(false, "mut");
             //m.

@@ -86,12 +86,13 @@ namespace ConsoleApp1
             return s;
         }
 
-        public static async Task<string> Method5(string ident, string filename, CancellationToken ct, ReaderWriterLock rwl)
+        public static async Task<string> Method5(string ident, string filename, CancellationToken ct, ReaderWriterLockSlim rwl)
         {
             bool lockTaken = false;
 
             string result = "reader failed, timed-out";
-            rwl.AcquireReaderLock(50);
+            //rwl.AcquireReaderLock(50);
+            rwl.TryEnterReadLock(20);
             try
             {
                 Console.WriteLine(ident + " entered lock");
@@ -101,19 +102,19 @@ namespace ConsoleApp1
             }
             finally
             {
-                rwl.ReleaseReaderLock();
+                rwl.ExitReadLock();
                 Console.WriteLine(ident + " left lock");
             }
             return ident + ": " + result;
 
         }
 
-        public static async Task<string> Method6(string ident, string filename, CancellationToken ct, ReaderWriterLock rwl)
+        public static async Task<string> Method6(string ident, string filename, CancellationToken ct, ReaderWriterLockSlim rwl)
         {
             bool lockTaken = false;
 
             string result = "writer failed, timed-out";
-            rwl.AcquireWriterLock(50);
+            rwl.TryEnterWriteLock(20);
             try
             {
                 Console.WriteLine(ident + " entered lock");
@@ -124,7 +125,7 @@ namespace ConsoleApp1
             }
             finally
             {
-                rwl.ReleaseWriterLock();
+                rwl.ExitWriteLock();
                 Console.WriteLine(ident + " left lock");
             }
             return ident + ": " + result;
