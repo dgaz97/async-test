@@ -252,7 +252,7 @@ namespace AsyncTest
 
         async static Task Main(string[] args)
         {
-            Mutex mutex = new Mutex(false,"Mutex testiranje");
+            Mutex mutex = new Mutex(false, "Mutex testiranje");
             Task t1 = Task.Run(async () =>
             {
                 for (int i = 0; i < 100; i++)
@@ -290,24 +290,28 @@ namespace AsyncTest
             });
 
             Console.WriteLine("Started");
-            while (!t1.IsCompleted||!t2.IsCompleted)
+            while (!t1.IsCompleted || !t2.IsCompleted)
             {
                 Console.Write(".");
                 await Task.Delay(1000);
             }
             //await t1;
-            Console.WriteLine("Done with status: "+t1.Status+"-"+t2.Status);
+            Console.WriteLine("Done with status: " + t1.Status + "-" + t2.Status);
 
 
-            Lazy<SumPair> pair = new Lazy<SumPair>();
-
-            Console.WriteLine(pair==null?"Null":"Not null");
-            Console.WriteLine(pair.IsValueCreated?"Value created": "Value not created");
-
-            pair.Value.numberToSum = 40;
+            Lazy<SumPair> pair = new Lazy<SumPair>(()=>new SumPair(55),LazyThreadSafetyMode.ExecutionAndPublication);
 
             Console.WriteLine(pair == null ? "Null" : "Not null");
             Console.WriteLine(pair.IsValueCreated ? "Value created" : "Value not created");
+
+            Task<SumPair> t3 = Task.Run<SumPair>(() => pair.Value);
+            Task<SumPair> t4 = Task.Run<SumPair>(() => pair.Value);
+            await Task.WhenAll(t3, t4);
+            Console.WriteLine(object.ReferenceEquals(t3.Result, t4.Result));
+
+            Console.WriteLine(pair == null ? "Null" : "Not null");
+            Console.WriteLine(pair.IsValueCreated ? "Value created" : "Value not created");
+            Console.WriteLine(pair.Value.numberToSum);
 
 
 
