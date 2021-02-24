@@ -86,63 +86,46 @@ namespace ConsoleApp1
             return s;
         }
 
-        public static async Task<string> Method5(string ident, string filename, CancellationToken ct)
+        public static async Task<string> Method5(string ident, string filename, CancellationToken ct, ReaderWriterLock rwl)
         {
             bool lockTaken = false;
 
             string result = "reader failed, timed-out";
+            rwl.AcquireReaderLock(50);
             try
             {
-                Monitor.TryEnter(filename, new TimeSpan(500), ref lockTaken);
-                if (lockTaken)
-                {
-                    Console.WriteLine(ident + " entered lock");
-                    ct.ThrowIfCancellationRequested();
-                    result = File.ReadAllText(filename);
-                    Thread.Sleep(20);
-                    Console.WriteLine(ident + " left lock");
-                }
-                else
-                {
-                    throw new TimeoutException("Failed to get lock on: " + filename);
-                }
+                Console.WriteLine(ident + " entered lock");
+                ct.ThrowIfCancellationRequested();
+                result = File.ReadAllText(filename);
+                Thread.Sleep(20);
             }
             finally
             {
-                if (lockTaken)
-                    Monitor.Exit(filename);
+                rwl.ReleaseReaderLock();
+                Console.WriteLine(ident + " left lock");
             }
             return ident + ": " + result;
 
         }
 
-        public static async Task<string> Method6(string ident, string filename, CancellationToken ct)
+        public static async Task<string> Method6(string ident, string filename, CancellationToken ct, ReaderWriterLock rwl)
         {
             bool lockTaken = false;
 
             string result = "writer failed, timed-out";
-
+            rwl.AcquireWriterLock(50);
             try
             {
-                Monitor.TryEnter(filename, new TimeSpan(500), ref lockTaken);
-                if (lockTaken)
-                {
-                    Console.WriteLine(ident + " entered lock");
-                    ct.ThrowIfCancellationRequested();
-                    File.WriteAllText(filename, "Now it says something else lol");
-                    result = "Written some stuff";
-                    Thread.Sleep(20);
-                    Console.WriteLine(ident + " left lock");
-                }
-                else
-                {
-                    throw new TimeoutException("Failed to get lock on: " + filename);
-                }
+                Console.WriteLine(ident + " entered lock");
+                ct.ThrowIfCancellationRequested();
+                File.WriteAllText(filename, "Now it says something else lol");
+                result = "Written some stuff";
+                Thread.Sleep(20);
             }
             finally
             {
-                if (lockTaken)
-                    Monitor.Exit(filename);
+                rwl.ReleaseWriterLock();
+                Console.WriteLine(ident + " left lock");
             }
             return ident + ": " + result;
 
