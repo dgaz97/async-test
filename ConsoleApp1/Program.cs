@@ -88,7 +88,7 @@ namespace AsyncTest
             Console.ReadKey();
         }*/
 
-        async static Task Main(string[] args)
+        /*async static Task Main(string[] args)
         {
             var CancelTokenSource1 = new CancellationTokenSource();
             var CancelTokenSource2 = new CancellationTokenSource();
@@ -131,7 +131,7 @@ namespace AsyncTest
             Task t18 = Task.Factory.StartNew(() => MethodClass.SafeIncrement(ref number2));
             Task t19 = Task.Factory.StartNew(() => MethodClass.SafeIncrement(ref number2));
 
-            Task all = Task.WhenAll(t1, t2, t3/*, t4,t5,t6*/, t7, t8, t9, /*t10,*/ t11, t12,t13,t14,t15,t16,t17,t18,t19);
+            //Task all = Task.WhenAll(t1, t2, t3, t4,t5,t6, t7, t8, t9, t10, t11, t12,t13,t14,t15,t16,t17,t18,t19);
             try
             {
                 //CancelTokenSource3.CancelAfter(2000);
@@ -248,6 +248,56 @@ namespace AsyncTest
             }
             Console.ReadKey();
 
+        }*/
+
+        async static Task Main(string[] args)
+        {
+            Mutex mutex = new Mutex(false,"Mutex testiranje");
+            Task t1 = Task.Run(async () =>
+            {
+                for (int i = 0; i < 100_000; i++)
+                {
+                    mutex.WaitOne();
+                    string s = File.ReadAllText(@"C:\test\test2.txt");
+                    long n = Convert.ToInt64(s);
+                    n++;
+
+                    File.WriteAllText(@"C:\test\test2.txt", n.ToString());
+
+                    //Console.WriteLine(n);
+                    //Thread.Sleep(1);
+                    mutex.ReleaseMutex();
+                }
+
+            });
+
+            Task t2 = Task.Run(async () =>
+            {
+                for (int i = 0; i < 100_000; i++)
+                {
+                    mutex.WaitOne();
+                    string s = File.ReadAllText(@"C:\test\test2.txt");
+                    long n = Convert.ToInt64(s);
+                    n++;
+
+                    File.WriteAllText(@"C:\test\test2.txt", n.ToString());
+
+                    //Console.WriteLine(n);
+                    //Thread.Sleep(1);
+                    mutex.ReleaseMutex();
+                }
+
+            });
+
+            Console.WriteLine("Started");
+            while (!t1.IsCompleted||!t2.IsCompleted)
+            {
+                Console.Write(".");
+                await Task.Delay(1000);
+            }
+            //await t1;
+            Console.WriteLine("Done with status: "+t1.Status+"-"+t2.Status);
+            Console.ReadKey();
         }
 
     }

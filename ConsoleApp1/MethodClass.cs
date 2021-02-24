@@ -154,7 +154,7 @@ namespace ConsoleApp1
         public static string Method9(CancellationToken ct)
         {
             Console.WriteLine("Written in method9");
-            for (int i = 0; i < 1000000000; i++) ;//Waste time, without calling delay
+            for (int i = 0; i < 1_000_000_000; i++) ;//Waste time, without calling delay
 
             Task child = Task.Factory.StartNew(() => throw new Exception("Another exception test, should propagate?"), TaskCreationOptions.AttachedToParent);
             Task child2 = Task.Factory.StartNew(() => throw new Exception("Another nother exception test, should propagate?"), TaskCreationOptions.AttachedToParent);
